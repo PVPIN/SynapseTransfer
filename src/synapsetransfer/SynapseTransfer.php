@@ -36,7 +36,9 @@ class SynapseTransfer extends PluginBase{
 		]);
 		$this->conf = $this->config->getAll();
 		$this->list = $this->conf["list"];
-		if(!$this->getServer()->isSynapseEnabled()){
+
+		$synapsePM = $this->getServer()->getPluginManager()->getPlugin('SynapsePM');
+		if(!$synapsePM->getConfig()->get('synapses')[0]['enabled']){
 			$this->getLogger()->error("Synapse Client service has been disabled, this plugin won't work!");
 			$this->setEnabled(false);
 			return;
@@ -67,7 +69,8 @@ class SynapseTransfer extends PluginBase{
 	 * @return array|null
 	 */
 	public function getClientDataByDescription(string $des){
-		foreach($this->getServer()->getSynapse()->getClientData() as $cdata){
+		$synapse = $this->getServer()->getPluginManager()->getPlugin('SynapsePM')->getSynapse();
+		foreach($synapse->getClientData() as $cdata){
 			if($cdata["description"] == $des){
 				return $cdata;
 			}
@@ -80,7 +83,8 @@ class SynapseTransfer extends PluginBase{
 	 * @return null|string
 	 */
 	public function getClientHashByDescription(string $des){
-		foreach($this->getServer()->getSynapse()->getClientData() as $hash => $cdata){
+		$synapse = $this->getServer()->getPluginManager()->getPlugin('SynapsePM')->getSynapse();
+		foreach($synapse->getClientData() as $hash => $cdata){
 			if($cdata["description"] == $des){
 				return $hash;
 			}
@@ -144,7 +148,9 @@ class SynapseTransfer extends PluginBase{
 								return true;
 							}
 							if($player instanceof Player and ($hash = $this->getClientHashByDescription($des)) != null){
-								if($des == $sender->getServer()->getSynapse()->getDescription()){
+
+								$synapse = $sender->getServer()->getPluginManager()->getPlugin('SynapsePM')->getSynapse();
+								if($des == $synapse->getDescription()){
 									$sender->sendMessage(TextFormat::RED . "Cannot transfer to the current server");
 									return true;
 								}
@@ -163,7 +169,8 @@ class SynapseTransfer extends PluginBase{
 							return true;
 						}
 						if(($hash = $this->getClientHashByDescription($des)) != null){
-							if($des == $sender->getServer()->getSynapse()->getDescription()){
+							$synapse = $sender->getServer()->getPluginManager()->getPlugin('SynapsePM')->getSynapse();
+							if($des == $synapse->getDescription()){
 								$sender->sendMessage(TextFormat::RED . "Cannot transfer to the current server");
 								return true;
 							}
